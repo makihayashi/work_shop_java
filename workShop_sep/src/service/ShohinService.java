@@ -1,4 +1,5 @@
 package service;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -9,106 +10,70 @@ import java.util.ArrayList;
 
 import bean.ShohinBean;
 
-public class ShohinService{
 
-	private static final String POSTGRES_DRIVER = "org.postgresql.Driver";
-
-    private static final String JDBC_CONNECTION = "jdbc:postgresql://localhost:5432/lesson_db";
-
+public class ShohinService {
+	// 問① 接続情報を記述してください
+    /** ドライバーのクラス名 */
+    private static final String POSTGRES_DRIVER = "org.postgresql.Driver";
+    /** ・JDMC接続先情報 */
+    private static final String JDBC_CONNECTION =  "jdbc:postgresql://localhost:5432/Employee";
+    /** ・ユーザー名 */
     private static final String USER = "postgres";
-
+    /** ・パスワード */
     private static final String PASS = "postgres";
+    /** ・タイムフォーマット */
+    static //    private static final String TIME_FORMAT = "yyyy/MM/dd hh:mm:ss";
+    ArrayList<ShohinBean> ArrayList = new ArrayList<ShohinBean>();
+    // 問② 入力された値を、INSERTする文
+    /** ・SQL INSERT文 */
+//    private static final String SQL_INSERT = "INSERT INTO drink_table(id,name,price,stock,ImgURL)"+"VALUES(?,?,?,?,?)";
 
-    private static final String LIST_SELECT_SQL = "SELECT shohin_id,name,price,image_url FROM shohin_table where price <= ?;";
+    // 問③ 入力されたIDをキーにして、検索するSELECT文
+    /** ・SQL SELECT文 */
+    private static final String SQL_SELECT = "SELECT * FROM Items";
 
-    private static final String DETAIL_SELECT_SQL = "SELECT * FROM shohin_table where shohin_id = ?;";
+    static ShohinBean drinkDate = null;
 
-    private static final String BUY_UPDATE_SQL = "UPDATE shohin_table SET stock = ? WHERE shohin_id = ?;";
+    // 送信されたIDとPassWordを元に社員情報を検索するためのメソッド
 
-    Connection connection = null;
-    Statement statement = null;
-    ResultSet resultSet = null;
+    public static ArrayList<ShohinBean> search() {
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        PreparedStatement preparedStatement = null;
 
-    ShohinBean shohinData;
+        try {
+            // データベースに接続
+            Class.forName(POSTGRES_DRIVER);
+            connection = DriverManager.getConnection(JDBC_CONNECTION, USER, PASS);
+            statement = connection.createStatement();
+            preparedStatement = connection.prepareStatement(SQL_SELECT);
 
-	public ArrayList<ShohinBean> searchList(int money){
-		ArrayList<ShohinBean> shohinList = new ArrayList<ShohinBean>();
-
-		try {
-
-			Class.forName(POSTGRES_DRIVER);
-	        connection = DriverManager.getConnection(JDBC_CONNECTION, USER, PASS);
-
-	        PreparedStatement psExecuteQuery = connection.prepareStatement(LIST_SELECT_SQL);
-            psExecuteQuery.setInt(1, money);
-            resultSet = psExecuteQuery.executeQuery();
-
-            while (resultSet.next()) {
-                String id = resultSet.getString("shohin_id");
-                String name = resultSet.getString("name");
-                int price = resultSet.getInt("price");
-                String imageUrl = resultSet.getString("image_url");
-
-                shohinData = new ShohinBean();
-                shohinData.setId(id);
-                shohinData.setName(name);
-                shohinData.setPrice(price);
-                shohinData.setImageUrl(imageUrl);
-                shohinList.add(shohinData);
-            }
-
-
-		}catch(ClassNotFoundException e) {
-			e.printStackTrace();
-		}catch(SQLException e) {
-			e.printStackTrace();
-		}finally{
-			try {
-                if (resultSet != null) {
-                    resultSet.close();
-                }
-                if (statement != null) {
-                    statement.close();
-                }
-                if (connection != null) {
-                    connection.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-		}
-
-		return shohinList;
-	}
-
-	public ShohinBean showDetail(String id){
-
-		try {
-
-			Class.forName(POSTGRES_DRIVER);
-	        connection = DriverManager.getConnection(JDBC_CONNECTION, USER, PASS);
-
-	        PreparedStatement psExecuteQuery = connection.prepareStatement(DETAIL_SELECT_SQL);
-            psExecuteQuery.setString(1, id);
-            resultSet = psExecuteQuery.executeQuery();
+//            preparedStatement.setInt(1, price);
+            // SQLを実行。実行した結果をresultSetに格納。
+            resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                String name = resultSet.getString("name");
-                int price = resultSet.getInt("price");
-                int stock = resultSet.getInt("stock");
-                String imageUrl = resultSet.getString("image_url");
-                String lastDate = resultSet.getString("up_date");
+                // 問⑦ tmpName,tmpComment,tmpLoginTimeに適当な値を入れてください。
+                String tmpName = resultSet.getString("name");
+                Integer tmpPrice = resultSet.getInt("price");
+                String tmpImg = resultSet.getString("img_url");
 
-                shohinData = new ShohinBean(id,name,price,stock,imageUrl,lastDate);
+                // 問⑧ drinkBeanに取得したデータを入れてください。
+                drinkDate = new ShohinBean();
+                drinkDate.setName(tmpName);
+                drinkDate.setPrice(tmpPrice);
+                drinkDate.setImgURL(tmpImg);
+                ArrayList.add(drinkDate);
             }
-
-
-		}catch(ClassNotFoundException e) {
-			e.printStackTrace();
-		}catch(SQLException e) {
-			e.printStackTrace();
-		}finally{
-			try {
+            // forName()で例外発生
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            // getConnection()、createStatement()、executeQuery()で例外発生
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
                 if (resultSet != null) {
                     resultSet.close();
                 }
@@ -121,52 +86,7 @@ public class ShohinService{
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-		}
-
-		return shohinData;
-	}
-
-	public String shohinBuy(String id, int currentStock){
-		String message = "";
-		if(0 == currentStock) {
-			message = "在庫がないため、購入できません";
-			return message;
-		}
-
-		try {
-
-			Class.forName(POSTGRES_DRIVER);
-	        connection = DriverManager.getConnection(JDBC_CONNECTION, USER, PASS);
-
-	        int updateStock = currentStock - 1;
-	        PreparedStatement psExecuteUpdate = connection.prepareStatement(BUY_UPDATE_SQL);
-	        psExecuteUpdate.setInt(1, updateStock);
-            psExecuteUpdate.setString(2, id);
-            psExecuteUpdate.executeUpdate();
-
-            message = "購入しました。";
-
-
-		}catch(ClassNotFoundException e) {
-			e.printStackTrace();
-		}catch(SQLException e) {
-			e.printStackTrace();
-		}finally{
-			try {
-                if (resultSet != null) {
-                    resultSet.close();
-                }
-                if (statement != null) {
-                    statement.close();
-                }
-                if (connection != null) {
-                    connection.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-		}
-
-		return message;
-	}
+        }
+        return ArrayList;
+    }
 }

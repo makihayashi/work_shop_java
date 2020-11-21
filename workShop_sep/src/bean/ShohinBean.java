@@ -1,72 +1,51 @@
 package bean;
 
-public class ShohinBean{
-	private String id;
-	private String name;
-	private int price;
-	private int stock;
-	private String imageUrl;
-	private String lastDate;
+public class ShohinBean {
+		private Integer Id;
+	    private String Name;
+	    private Integer Price;
+	    private String Insert_date;
+	    private String ImgURL;
 
-	public ShohinBean() {
+	    public void setId(Integer Id) {
+	        this.Id = Id;
+	    }
 
-	}
+	    public Integer Id() {
+	        return Id;
+	    }
 
-	public ShohinBean(String id, String name, int price,
-			int stock,String imageUrl, String lastDate) {
-		this.id = id;
-		this.name = name;
-		this.price = price;
-		this.stock = stock;
-		this.imageUrl = imageUrl;
-		this.lastDate = lastDate;
-	}
+	    public void setName(String Name) {
+	        this.Name = Name;
+	    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+	    public String getName() {
+	        return Name;
+	    }
 
-	public String getId() {
-		return this.id;
-	}
+	    public void setPrice(Integer Price) {
+	        this.Price = Price;
+	    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+	    public Integer getPrice() {
+	        return Price;
+	    }
 
-	public String getName() {
-		return this.name;
-	}
 
-	public void setPrice(int price) {
-		this.price = price;
-	}
+	    public void setInsert_date(String Insert_date) {
+	        this.Insert_date = Insert_date;
+	    }
 
-	public int getPrice() {
-		return this.price;
-	}
+	    public String getInsert_date() {
+	        return Insert_date;
+	    }
 
-	public void setStock(int stock) {
-		this.stock = stock;
-	}
+	    public void setImgURL(String ImgURL) {
+	        this.ImgURL = ImgURL;
+	    }
 
-	public int getStock() {
-		return this.stock;
-	}
+	    public String getImgURL() {
+	        return ImgURL;
+	    }
 
-	public void setImageUrl(String imageUrl) {
-		this.imageUrl = imageUrl;
-	}
-
-	public String getImageUrl() {
-		return this.imageUrl;
-	}
-
-	public void setLastDate(String lastDate) {
-		this.lastDate = lastDate;
-	}
-
-	public String getLastDate() {
-		return this.lastDate;
-	}
 }
